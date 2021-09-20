@@ -15,7 +15,7 @@ const client = new Discord.Client({
 
 let settings = {
     prefix: '-',
-    token: 'NzQ2NDMyOTI2ODQ1MjM5MzY2.X0AP1Q.99BL-iByOKTFxUnbTFAqDJwLO8c',
+    token: '',
 };
 
 const { Player } = require("discord-music-player");
