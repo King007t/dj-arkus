@@ -57,6 +57,7 @@ client.on('messageCreate', async (m) => {
 
                 m.guild.channels.create("capybara-vibes").then((c) => {
                     createEmbed(null, false, c);
+                    edCh = c;
                 }).catch((err) => {
                     sendMessage(m.channel, err, 4);
                 });
@@ -83,7 +84,7 @@ client.on('messageCreate', async (m) => {
             var text = 
             `Use \`${settings.prefix}skip\` to skip the song which is currently playing \n` +
             `Use \`${settings.prefix}pause\` to pause the player \n` +
-            `Use \`${settings.prefix}resume\` to resume the player \n` +
+            `Use \`${settings.prefix}play\` to resume the player \n` +
             `Use \`${settings.prefix}stop\` to stop the player and clear the queue \n` +
             `Use \`${settings.prefix}shuffle\` to skip the song which is currently playing \n` +
             `Use \`${settings.prefix}link\` to get the link leading to the current song (You can also click on the title of the info message)\n` +
@@ -101,7 +102,7 @@ client.on('messageCreate', async (m) => {
             updateStatus(null, true);
             sendMessage(m.channel, "Paused player", 3);
             break;
-            case(`${settings.prefix}resume`):
+            case(`${settings.prefix}play`):
             guildQueue.setPaused(false);
             updateStatus(guildQueue.nowPlaying);
             sendMessage(m.channel, "Unpaused player", 3);
@@ -119,15 +120,16 @@ client.on('messageCreate', async (m) => {
             sendMessage(m.channel, "Shuffled queue", 3);
             break;
             case(`${settings.prefix}link`):
-            if(guildQueue.nowPlaying == null){
-                sendMessage(m.channel, "There isn't anything playing", 4);
-                return;
+            if(guildQueue != null && guildQueue.nowPlaying != null){
+                m.channel.send({embeds: [
+                    new Discord.MessageEmbed()
+                    .setColor("#6b3a3d")
+                    .setDescription(guildQueue.nowPlaying.url)
+                ]});
             }
-            m.channel.send({embeds: [
-                new Discord.MessageEmbed()
-                .setColor("#6b3a3d")
-                .setDescription(guildQueue.nowPlaying.url)
-            ]});
+            else{
+                sendMessage(m.channel, "There isn't anything playing", 4);
+            }
             break;
             case(`${settings.prefix}queue`):
             let em = new Discord.MessageEmbed()
@@ -135,7 +137,7 @@ client.on('messageCreate', async (m) => {
             .setColor('#6b3a3d')
             .setTimestamp()
             .setThumbnail("https://pbs.twimg.com/media/CaykiJeUMAAr4V5.jpg")
-            .setFooter(`the prefix is ${settings.prefix}`);
+            .setFooter({ text: `the prefix is ${settings.prefix}`, iconURL: 'https://pbs.twimg.com/media/CaykiJeUMAAr4V5.jpg' })
 
             var desc = "";
             var songs = guildQueue.songs;
@@ -251,7 +253,7 @@ async function createEmbed(song, u, c){
     .setImage(image)
     .setTimestamp()
     .setThumbnail("https://pbs.twimg.com/media/CaykiJeUMAAr4V5.jpg")
-    .setFooter(`the prefix is ${settings.prefix}`);
+    .setFooter({ text: `the prefix is ${settings.prefix}`, iconURL: 'https://pbs.twimg.com/media/CaykiJeUMAAr4V5.jpg' })
 
     if(song != null){
         embed.setURL(song.url);
@@ -262,8 +264,8 @@ async function createEmbed(song, u, c){
             edDat.eC = c.id;
             edDat.eM = msg.id;
 
-            console.log(`${edDat.eC}`);
-            console.log(`${edDat.eM}`);
+            //console.log(`${edDat.eC}`);
+            //console.log(`${edDat.eM}`);
     
             saveData();
         });
@@ -318,8 +320,8 @@ async function sendMessage(c, text, sec){
 }
 
 function saveData(){
-    console.log(JSON.stringify(edDat));
-
+    //console.log(JSON.stringify(edDat));
+    console.log("Saved Channel Data");
     fs.writeFileSync(path.resolve(__dirname, 'data.json'), JSON.stringify(edDat));
 }
 //#endregion
